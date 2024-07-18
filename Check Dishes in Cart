@@ -1,0 +1,31 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE check_dishes_cart(
+    v_cartid IN NUMBER
+) AS
+    v_count NUMBER;
+    v_dishname VARCHAR2(20);
+    v_price DECIMAL(4,2);
+    v_quantity NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM cartdish WHERE cartid = v_cartid;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Cart ID');
+    ELSE
+        SELECT dishanme, price, quantity 
+        INTO v_dishname, v_price, v_quantity 
+        FROM dishes 
+        JOIN cartdish ON dishes.dishid = cartdish.dishid
+        WHERE cartid = v_cartid;
+        DBMS_OUTPUT.PUT_LINE('Dish name: ' || v_dishname || CHR(10) || 
+                             'Price: ' || v_price || CHR(10) || 
+                             'Quantity: ' || v_quantity);
+    END IF;
+END;
+/
+
+BEGIN
+    check_dishes_cart(8);
+END;
+/
+-- Output: Prints details of dishes in the cart
