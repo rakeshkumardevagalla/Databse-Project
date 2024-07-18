@@ -1,0 +1,27 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE restaurant_by_category(
+    v_categoryname IN VARCHAR
+) IS
+    v_restaurantname VARCHAR2(50);
+    v_avgreviewscore DECIMAL(4,2);
+    v_avgwaitime DECIMAL(4,2);
+    v_zipcode NUMBER;
+BEGIN
+    SELECT restaurantname, avgreviewscore, avgwaittime, rzipcode 
+    INTO v_restaurantname, v_avgreviewscore, v_avgwaitime, v_zipcode
+    FROM restaurants r 
+    JOIN rcategory rc ON rc.restaurantid = r.restaurantid
+    WHERE LOWER(SUBSTR(category, 0, 4)) = v_categoryname AND LOWER(current_status) = 'open';
+    DBMS_OUTPUT.PUT_LINE('Restaurant name: ' || v_restaurantname || 
+                         ' Avgreviewscore: ' || v_avgreviewscore || 
+                         ' Avgwaitime: ' || v_avgwaitime || 
+                         ' Zipcode: ' || v_zipcode);
+END;
+/
+
+BEGIN
+    restaurant_by_category('seaf');
+END;
+/
+-- Output: Restaurant name, Avgreviewscore, Avgwaitime, Zipcode
