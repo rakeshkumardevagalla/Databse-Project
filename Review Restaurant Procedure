@@ -1,0 +1,23 @@
+CREATE OR REPLACE PROCEDURE p_review_restaurant(v_restaurantid IN NUMBER) IS
+    v_count NUMBER;
+    CURSOR c_restaurant IS
+        SELECT restaurantname, review.reviewscore, review.comments, review.reviewdate
+        FROM restaurants
+        JOIN review ON review.restaurantid = restaurants.restaurantid
+        WHERE restaurants.restaurantid = v_restaurantid;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM review WHERE restaurantid = v_restaurantid;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Restaurant ID');
+    ELSE
+        FOR i IN c_restaurant LOOP
+            DBMS_OUTPUT.PUT_LINE('The ' || i.restaurantname || ' has rated ' || i.reviewscore || ' with comments ' || i.comments || ' on ' || i.reviewdate);
+        END LOOP;
+    END IF;
+END;
+/
+
+--test cases
+
+EXEC p_review_restaurant(102);
+EXEC p_review_restaurant(10);
