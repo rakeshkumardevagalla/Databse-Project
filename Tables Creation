@@ -1,0 +1,193 @@
+drop table customer;
+drop table discounts;
+drop table storediscounts;
+drop table storedepartment;
+drop table restaurants;
+drop table rcategory;
+drop table dishes;
+drop table review;
+drop table cart;
+drop table cartdish;
+drop table order_table;
+drop table sysdish;
+drop table paymentrecord;
+drop table message;
+drop table states;
+drop table tax_table;
+
+
+
+
+create table customer
+(
+customerID number primary key,
+Cname varchar2(50),
+address varchar2(50),
+zipcode number(6),
+state VARCHAR2(50),
+email VARCHAR2(50) unique,
+credit int
+);
+
+create table discounts
+(
+Discountid int primary key,
+Discount_description VARCHAR2(50),
+Discount_type number(1)
+);
+
+create table storediscounts
+(
+storediscounts int primary key,
+customerid int,
+discountid int,
+dstartdate date,
+denddate date,
+foreign key (customerid) references customer(customerid),
+foreign key (discountid) references discounts(discountid)
+);
+
+create table storedepartment
+(
+categoryid int primary key,
+categoryname VARCHAR2(50)
+);
+
+create table restaurants
+(
+restaurantid int PRIMARY KEY,
+restaurantname varchar2(50),
+raddress VARCHAR2(100),
+rphonenumber VARCHAR2(100),
+current_status varchar2(10),
+rzipcode int,
+rstate VARCHAR2(20),
+avgwaittime number(10,2),
+avgreviewscore decimal(3,1)
+);
+
+
+alter table restaurants
+add CONSTRAINT f_rstate foreign key (rstate) references states(statename);
+
+create table rcategory
+(
+rcategoryid int primary key,
+restaurantid int,
+category varchar2(50),
+foreign key (restaurantid) references restaurants(restaurantid)
+);
+
+
+
+create table dishes
+(dishid int primary key,
+restaurantid int,
+dishanme varchar2(50),
+price decimal(10,2),
+foreign key (restaurantid) references restaurants(restaurantid)
+);
+
+
+create table review
+(
+reviewid int primary key,
+customerid int,
+restaurantid int,
+reviewdate date,
+reviewscore decimal(3,1),
+comments varchar2(100),
+foreign key (customerid) references customer(customerid),
+foreign key (restaurantid) references restaurants(restaurantid)
+);
+
+create table cart
+(
+cartid int primary key,
+customerid int,
+restaurantid int,
+foreign key (customerid) references customer(customerid),
+foreign key (restaurantid) references restaurants(restaurantid)
+);
+
+
+create table cartdish
+(
+cartdish int primary key,
+cartid int,
+dishid int,
+quantity int,
+foreign key (cartid) references cart(cartid),
+foreign key (dishid) references dishes(dishid)
+);
+
+create table order_table
+(
+orderid int primary key,
+customerid int,
+restaurantid int,
+ordertime TIMESTAMP,
+deliverytime TIMESTAMP,
+estimatedtime TIMESTAMP,
+order_status varchar2(50),
+payment_status varchar2(20),
+delivery_method number(1),
+totalcost decimal(10,2),
+foreign key (customerid) REFERENCES customer(customerid),
+foreign key (restaurantid) references restaurants(restaurantid)
+);
+
+
+create table sysdish
+(
+sysdishid int primary key,
+orderid int,
+dishid int,
+foreign key (orderid) REFERENCES order_table(orderid),
+foreign key (dishid) REFERENCES dishes(dishid)
+);
+
+create table payments
+(
+paymentid int primary key,
+customerid int,
+paymenttime TIMESTAMP,
+orderid int,
+amount decimal(10,2),
+paymentmethod varchar2(50),
+foreign key (customerid) REFERENCES customer(customerid),
+foreign key (orderid) references order_table(orderid),
+CONSTRAINT chk_paymentmethod CHECK (paymentmethod='credit' or paymentmethod='debit' or paymentmethod='apple pay' or paymentmethod='paypal')
+);
+
+
+create table message
+(
+message_id int primary key,
+customerid int,
+message_time TIMESTAMP,
+message_body varchar2(100),
+foreign key (customerid) REFERENCES customer(customerid)
+);
+
+create table states
+(
+statename varchar2(50) primary key
+);
+
+
+create table tax_table
+(
+taxid int primary key,
+rate decimal(3,2),
+state varchar2(50),
+foreign key (state) references states(statename)
+);
+
+
+
+alter table storedepartment
+add restaurantid int;
+
+alter table storedepartment
+add CONSTRAINT f_restaurantid foreign key (restaurantid) references restaurants(restaurantid);
