@@ -1,0 +1,39 @@
+CREATE OR REPLACE PROCEDURE p_review (
+    v_customerid IN NUMBER,
+    v_restaurantid IN NUMBER,
+    v_reviewdate IN DATE,
+    v_reviewscore IN NUMBER,
+    v_comments IN VARCHAR2
+) IS
+    v_count NUMBER;
+    v_reviewid NUMBER := seq_reviewid.NEXTVAL;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM customer WHERE customerid = v_customerid;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Customer ID');
+    ELSE
+        SELECT COUNT(*) INTO v_count FROM restaurants WHERE restaurantid = v_restaurantid;
+        IF v_count = 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Invalid Restaurant ID');
+        ELSE
+            INSERT INTO review VALUES(seq_reviewid.NEXTVAL, v_customerid, v_restaurantid, v_reviewdate, v_reviewscore, v_comments);
+            UPDATE restaurants
+            SET avgreviewscore = (SELECT SUM(reviewscore) / COUNT(reviewscore) FROM review WHERE restaurantid = v_restaurantid)
+            WHERE restaurants.restaurantid = v_restaurantid;
+        END IF;
+    END IF;
+END;
+/
+
+---Sequence Creation
+DROP SEQUENCE seq_reviewid;
+CREATE SEQUENCE seq_reviewid
+START WITH 65
+INCREMENT BY 1;
+
+
+
+---Test cases 
+EXECUTE p_review(3, 101, '13-FEB-21', 10, 'too good');
+SELECT * FROM review;
+SELECT * FROM restaurants;
