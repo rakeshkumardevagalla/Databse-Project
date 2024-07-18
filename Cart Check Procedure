@@ -1,0 +1,87 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE p_cart_check (
+    v_cartid IN NUMBER,
+    v_checkout_time IN TIMESTAMP,
+    v_deliverymethod IN NUMBER
+) AS
+    deliveryfee NUMBER;
+    order_amount NUMBER;
+    tax_amount NUMBER;
+    totalamount NUMBER;
+    v_count NUMBER;
+    cart_price NUMBER;
+    czip NUMBER;
+    rzip NUMBER;
+    rtax NUMBER;
+    distyp VARCHAR2(100);
+    damount NUMBER;
+    dis_amt NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM cart WHERE cartid = v_cartid;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Cart ID');
+    ELSE
+        SELECT SUM(cd.quantity * d.price) INTO cart_price
+        FROM cart c
+        JOIN cartdish cd ON c.cartid = cd.cartid
+        JOIN dishes d ON c.restaurantid = d.restaurantid AND cd.dishid = d.dishid
+        WHERE c.cartid = v_cartid
+        GROUP BY c.cartid;
+        DBMS_OUTPUT.PUT_LINE(cart_price);
+
+        SELECT customer.zipcode, r.rzipcode, d.discount_type, d.DISCOUNTAMOUNT, t.rate
+        INTO czip, rzip, distyp, damount, rtax
+        FROM cart c
+        JOIN customer ON c.customerid = customer.customerid
+        JOIN restaurants r ON c.restaurantid = r.restaurantid
+        LEFT JOIN storediscounts sd ON sd.customerid = c.customerid
+        JOIN discounts d ON d.discountid = sd.discountid
+        JOIN tax_table t ON t.state = r.rstate
+        WHERE c.cartid = v_cartid
+          AND sd.dstartdate <= TRUNC(v_checkout_time) AND sd.denddate >= TRUNC(v_checkout_time);
+
+        IF czip <> rzip THEN
+            deliveryfee := 5;
+        ELSE
+            deliveryfee := 2;
+        END IF;
+
+        IF v_deliverymethod = 2 THEN
+            deliveryfee := 0;
+        END IF;
+
+        IF distyp = 1 THEN
+            deliveryfee := 0;
+            dis_amt := 0;
+        ELSIF distyp = 2 THEN
+            dis_amt := cart_price * damount;
+        ELSE
+            dis_amt := damount;
+        END IF;
+
+        order_amount := cart_price - dis_amt;
+        tax_amount := order_amount * rtax / 100;
+        totalamount := order_amount + deliveryfee + tax_amount;
+
+        DBMS_OUTPUT.PUT_LINE('Order amount: ' || order_amount || ' Total tax: ' || tax_amount || ' Total amount: ' || totalamount);
+    END IF;
+EXCEPTION
+    WHEN no_data_found THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Inputs');
+END;
+/
+
+-----Test Cases
+SELECT * FROM storediscounts;
+
+BEGIN
+    p_cart_check(6, '13-JAN-20', 1);
+END;
+/
+
+BEGIN
+    p_cart_check(8, '10-MAY-22', 3);
+END;
+/
+
