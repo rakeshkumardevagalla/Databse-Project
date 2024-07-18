@@ -1,0 +1,74 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE Restaurant_recommendation(v_customerid IN NUMBER) IS
+    v_count NUMBER;
+
+    CURSOR c_restaurantname IS
+        SELECT restaurantname 
+        FROM restaurants r 
+        JOIN order_table o ON r.restaurantid = o.restaurantid 
+        WHERE customerid = v_customerid;
+
+    CURSOR c_customerid IS
+        SELECT DISTINCT customerid 
+        FROM restaurants r 
+        JOIN order_table o ON r.restaurantid = o.restaurantid
+        WHERE customerid <> v_customerid 
+        AND restaurantname IN (SELECT restaurantname 
+                               FROM restaurants r 
+                               JOIN order_table o ON r.restaurantid = o.restaurantid 
+                               WHERE customerid = v_customerid);
+
+    CURSOR cf_restaurantname IS
+        SELECT r.restaurantid, r.restaurantname, r.avgreviewscore, r.raddress 
+        FROM restaurants r 
+        JOIN order_table o ON r.restaurantid = o.restaurantid
+        WHERE customerid IN (SELECT DISTINCT o.customerid 
+                             FROM restaurants r 
+                             JOIN order_table o ON r.restaurantid = o.restaurantid 
+                             WHERE customerid <> v_customerid 
+                             AND restaurantname IN (SELECT restaurantname 
+                                                    FROM restaurants r 
+                                                    JOIN order_table o ON r.restaurantid = o.restaurantid 
+                                                    WHERE customerid = v_customerid))
+        AND r.restaurantname NOT IN (SELECT restaurantname 
+                                     FROM restaurants r 
+                                     JOIN order_table o ON r.restaurantid = o.restaurantid 
+                                     WHERE customerid = v_customerid);
+
+    cv_customerid c_customerid%ROWTYPE;
+    cv_restaurantname c_restaurantname%ROWTYPE;
+    cf_restaurantname_rec cf_restaurantname%ROWTYPE;
+
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM customer WHERE customerid = v_customerid;
+    IF (v_count = 0) THEN 
+        DBMS_OUTPUT.PUT_LINE('Invalid Customer ID');
+    ELSE
+        FOR i IN c_customerid LOOP
+            DBMS_OUTPUT.PUT_LINE('Customer ID: ' || i.customerid);
+        END LOOP;
+
+        FOR j IN c_restaurantname LOOP
+            DBMS_OUTPUT.PUT_LINE('Restaurant Name: ' || j.restaurantname);
+        END LOOP;
+
+        FOR k IN cf_restaurantname LOOP
+            DBMS_OUTPUT.PUT_LINE('Restaurant ID: ' || k.restaurantid || 
+                                 ' Restaurant Name: ' || k.restaurantname || 
+                                 ' Average Review Score: ' || k.avgreviewscore || 
+                                 ' Restaurant Address: ' || k.raddress);
+        END LOOP;
+    END IF;
+END;
+/
+
+----Test Cases
+
+SELECT * FROM customer;
+
+BEGIN
+    Restaurant_recommendation(1);
+END;
+/
+
