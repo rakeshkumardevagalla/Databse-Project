@@ -1,0 +1,111 @@
+//insert values
+ 
+
+Insert into customer values (001,'Bob','Jamestown', 21075,'Maryland','bob001@gmail.com',120);
+Insert into customer values (002,'Jack','Fairfax square', 20045,'Virginia','jack002@gmail.com',130);
+Insert into customer values (003,'Lilley','Dallas', 22245,'Texas','lilley003@gmail.com',140);
+Insert into customer values (004,'Ariana','Timesquare',22345,'Newyork','ariana004@gmail.com',150);
+Insert into customer values (005,'Aarish','hamsburg', 23456,'NewJersey','aarish005@gmail.com',160);
+---------------------------------------------------------------------------------------------------
+Insert into discounts values(111,'Free Delivery',1,0.0);
+Insert into discounts values(222,'Fixed Percent of total charge',2, 0.1);
+Insert into discounts values(333,'Fixed amount of total charge',3, 10);
+Insert into discounts values(444,'Fixed amount of total charge',4, 20);
+---------------------------------------------------------------------------------------------------
+Insert into availablediscounts values(1,001,111,date'2022-10-01',date'2022-10-05');
+Insert into availablediscounts values(2,002,222,date'2022-11-01',date'2022-11-10');
+Insert into availablediscounts values(3,003,333,date'2022-11-10',date'2022-11-15');
+Insert into availablediscounts values(4,004,444,date'2023-01-01',date '2023-01-10');
+Insert into availablediscounts values(5,005,555,date'2023-02-01',date '2023-02-22');
+---------------------------------------------------------------------------------------------------
+Insert into restaurants values(909,'El Agave','Mountridge','123456789','Open',21075,'MD',10.2,1);
+Insert into restaurants values(808,'Paradise','Maiden choice','6789123478','Open',21076,'MD',15,1);
+Insert into restaurants values(707,'Sitara','New Carriage','234567813','Open',21077,'Newjersey',30,1);
+Insert into restaurants values(606,'Novotel','Boston','4435567782','Open',21078,'MA',25.5,1);
+Insert into restaurants values(505,'Taj','Masonvalle','2349876511','Close',21078,'Virginia',55.5,1);
+---------------------------------------------------------------------------------------------------
+Insert into tax values (12,3.3,'maryland');
+Insert into tax values (13,4.3,'Texas');
+Insert into tax values (14,5.2,'Texas');
+Insert into tax values (15,6.2,'California');
+Insert into tax values (16,5.5,'Newjersey');
+---------------------------------------------------------------------------------------------------
+Insert into category values (201,'italian',505);
+Insert into category values (202,'chinese',606);
+Insert into category values (203,'indian',707);
+Insert into category values (204,'mexican',808);
+Insert into category values (205,'australian',909);
+Insert into category values (206,'Fast food',505);
+Insert into category values (207,'fast food',606);
+---------------------------------------------------------------------------------------------------
+Insert into restaurantcategory values(10101,909,'Veg Stater');
+Insert into restaurantcategory values(10201,808,'Non-veg Stater');
+Insert into restaurantcategory values(10301,707,'Continetal');
+Insert into restaurantcategory values(10501,606,'Deserts');
+Insert into restaurantcategory values(10401,505,'Oriental');
+---------------------------------------------------------------------------------------------------
+Insert into dishes values(111,909,'cheese pasta',50);
+Insert into dishes values(222,808,'Noodles',30);
+Insert into dishes values(333,707,'Croissants',60);
+Insert into dishes values(444,505,'Burger',40);
+Insert into dishes values(555,505,'French Fries',35);
+Insert into dishes values(666,606,'cheese pasta',80);
+Insert into dishes values(667,606,'Noodles',70);
+Insert into dishes values(668,606,'Croissants',90);
+Insert into dishes values(669,606,'Burger',75);
+Insert into dishes values(670,606,'French Fries',50);
+
+---------------------------------------------------------------------------------------------------
+Insert into review values(885,001,909,date '2022-10-20',3.5,'good');
+Insert into review values(886,002,808,date '2022-10-15',2.5,'Below Average');
+Insert into review values(887,003,707,date '2022-10-25',4.5,'Very Good');
+Insert into review values(888,004,606,date '2022-11-01',5.5,'Excellent');
+Insert into review values(889,005,505,date '2022-11-10',3.5,'good');
+---------------------------------------------------------------------------------------------------
+Insert into cart values(99,001,909);
+Insert into cart values(88,002,808);
+Insert into cart values(77,003,707);
+Insert into cart values(66,004,606);
+Insert into cart values(55,005,505);
+---------------------------------------------------------------------------------------------------
+insert into cartdish values(444,99,111,1);
+insert into cartdish values(445,99,667,2);
+insert into cartdish values(555,88,222,2);
+insert into cartdish values(666,77,333,4);
+insert into cartdish values(777,66,444,3);
+insert into cartdish values(888,55,555,2);
+---------------------------------------------------------------------------------------------------
+insert into ordertable values(100,1,909,timestamp '2022-11-5 09:15:00.00',timestamp '2022-11-6 11:10:00.00',timestamp '2022-10-3 11:00:00.00',2,'Paid',1,1500);
+insert into ordertable values(101,3,707,timestamp '2022-01-5 01:15:00.00',timestamp '2022-02-4 01:10:00.00',timestamp '2022-11-3 09:00:00.00',2,'Paid',2,2500);
+insert into ordertable values(102,2,606,timestamp '2022-03-5 09:18:00.00',timestamp '2022-04-2 11:10:00.00',timestamp '2022-12-3 10:03:00.00',2,'Paid',2,3500);
+insert into ordertable values(103,4,505,timestamp '2022-10-5 12:15:00.00',timestamp '2022-11-3 11:10:00.00',timestamp '2022-01-3 12:10:00.00',2,'Paid',1,1900);
+insert into ordertable values(104,5,808,timestamp '2022-11-3 09:15:00.00',timestamp '2022-12-2 11:10:00.00',timestamp '2022-02-3 11:00:00.00',2,'Paid',1,1500);
+insert into ordertable values(105,2,606,timestamp '2022-12-15 10:35:00.00',timestamp '2022-12-15 11:30:00.00',timestamp '2022-12-15 11:00:00.00',2,'paid',1,3000);
+insert into ordertable values(106,3,909,timestamp '2022-06-16 02:45:00.00',timestamp '2022-06-16 03:10:00.00',timestamp '2022-06-16 03:00:00.00',2,'paid',2,2700);
+insert into ordertable values(107,1,808,timestamp '2022-10-25 1:55:00.00',timestamp '2022-10-25 2:15:00.00',timestamp '2022-10-25 02:30:00.00',2,'paid',2,1200);
+insert into ordertable values(108,4,505,timestamp '2022-10-5 3:15:00.00',timestamp '2022-10-5 4:00:00.00',timestamp '2022-10-5 4:10:00.00',2,'paid',1,1300);
+insert into ordertable values(109,5,707,timestamp '2022-11-3 10:29:00.00',timestamp '2022-11-3 11:10:00.00',timestamp '2022-11-3 11:00:00.00','2','paid',1,2000);
+insert into ordertable values(110,3,505,timestamp '2022-06-20 02:45:00.00',timestamp '2022-06-20 03:10:00.00',timestamp '2022-06-20 03:00:00.00',2,'paid',2,300);
+insert into ordertable values(111,3,707,timestamp '2022-07-15 12:15:00.00',timestamp '2022-07-15 12:30:00.00',timestamp '2022-07-15 12:28:00.00',2,'paid',2,800);
+
+---------------------------------------------------------------------------------------------------
+Insert into dish_order values('401','100','111');
+Insert into dish_order values('402','101','222');
+Insert into dish_order values('403','102','333');
+Insert into dish_order values('404','103','444');
+Insert into dish_order values('405','104','555');
+----------------------------------------------------------------------------------------------------
+insert into payments values (44,001,timestamp '2022-10-5 08:10:00.00',100,1200,'debit');
+insert into payments values (45,002,timestamp '2022-10-4 09:10:00.00',101,2500,'credit');
+insert into payments values (46,003,timestamp '2022-10-5 10:20:00.00',102,1400,'apple pay');
+insert into payments values (47,004,timestamp '2022-10-6 09:20:30.00',103,1500,'paypal');
+
+
+---------------------------------------------------------------------------------------------------
+insert into message values(0031,001,timestamp '2022-5-3 02:02:00.00','Order has been delivered');
+insert into message values(0032,002,timestamp '2022-6-13 12:05:00.00','Order has been cancelled');
+insert into message values(0033,003,timestamp '2022-6-2 11:02:00.00','Order has been delivered');
+insert into message values(0034,004,timestamp '2022-7-1 04:05:00.00','Order has been replaced');
+insert into message values(0035,005,timestamp '2022-8-9 02:00:00.00','Order has been delivered');
+---------------------------------------------------------------------------------------------------
+commit;
