@@ -1,0 +1,44 @@
+DROP SEQUENCE customer_seq;
+CREATE SEQUENCE customer_seq 
+START WITH 6
+INCREMENT BY 1;
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE new_customer (
+    v_cname IN VARCHAR2,
+    v_address IN VARCHAR2,
+    v_state IN VARCHAR2,
+    v_zipcode IN NUMBER,
+    v_email IN VARCHAR2
+) IS
+    v_count NUMBER;
+    v_credit NUMBER := 0;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM customer WHERE email = v_email;
+    IF v_count = 1 THEN
+        DBMS_OUTPUT.PUT_LINE('The client already exists');
+        UPDATE customer
+        SET address = v_address, state = v_state, zipcode = v_zipcode
+        WHERE email = v_email;
+    ELSE
+        INSERT INTO customer(CUSTOMERID, CNAME, ADDRESS, ZIPCODE, STATE, EMAIL, CREDIT) 
+        VALUES(customer_seq.NEXTVAL, v_cname, v_address, v_zipcode, v_state, v_email, v_credit);
+        DBMS_OUTPUT.PUT_LINE('New Customer ID.');
+    END IF;
+END;
+/
+
+BEGIN
+    new_customer('Mary', 'Hazlett Ave', 'MD', 21229, 'mary@gmail.com');
+END;
+/
+-- Output: The client already exists
+
+BEGIN
+    new_customer('Rakesh', 'Hazlett Ave', 'MD', 21229, 'rakesh.devagalla@gmail.com');
+END;
+/
+-- Output: New Customer ID.
+
+SELECT * FROM customer;
