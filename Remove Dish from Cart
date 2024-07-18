@@ -1,0 +1,34 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE remove_dish_cart(
+    v_dishid IN NUMBER,
+    v_cartid IN NUMBER
+) AS
+    v_count NUMBER;
+    v_quantity NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM cartdish WHERE cartid = v_cartid AND dishid = v_dishid;
+    IF v_count = 0 THEN 
+        DBMS_OUTPUT.PUT_LINE('Invalid input');
+    ELSE
+        SELECT quantity INTO v_quantity FROM cartdish WHERE cartid = v_cartid AND dishid = v_dishid;
+        IF v_quantity > 1 THEN
+            UPDATE cartdish
+            SET quantity = quantity - 1
+            WHERE cartid = v_cartid AND dishid = v_dishid;
+            DBMS_OUTPUT.PUT_LINE('Quantity reduced');
+        ELSIF v_quantity = 1 THEN
+            DELETE FROM cartdish WHERE cartid = v_cartid AND dishid = v_dishid;
+            DBMS_OUTPUT.PUT_LINE('Dish removed');
+        END IF;
+    END IF;
+END;
+/
+
+BEGIN
+    remove_dish_cart(41, 7);
+END;
+
+SELECT * FROM cartdish;
+ROLLBACK;
+-- Output: Updates or removes the dish from the cart
