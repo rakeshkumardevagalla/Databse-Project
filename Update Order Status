@@ -1,0 +1,43 @@
+CREATE OR REPLACE PROCEDURE upstatus(
+    orid NUMBER,
+    status NUMBER,
+    intime TIMESTAMP
+) AS
+    cnt NUMBER;
+    custid NUMBER;
+    ordstatus VARCHAR(100);
+    totcost NUMBER;
+    pmethod VARCHAR2(50);
+BEGIN
+    SELECT COUNT(*) INTO cnt FROM order_table WHERE orderid = orid;
+    IF cnt = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid order id');
+    ELSE
+        SELECT customerid, order_status, totalcost INTO custid, ordstatus, totcost 
+        FROM order_table WHERE orderid = orid;
+        IF ordstatus = 'Delivered' THEN
+            DBMS_OUTPUT.PUT_LINE('Order delivered');
+        ELSE
+            UPDATE order_table 
+            SET order_status = (CASE WHEN status = 1 THEN 'Cooking' 
+                                     WHEN status = 2 THEN 'On the way' 
+                                     WHEN status = 3 THEN 'Delivered' 
+                                END), 
+                ordertime = intime 
+            WHERE orderid = orid;
+            DBMS_OUTPUT.PUT_LINE('Status updated');
+            IF status = 3 THEN
+                SELECT pay_method INTO pmethod FROM order_table WHERE orderid = orid;
+                INSERT INTO messages (customerid, message) VALUES (custid, 'Your order is delivered');
+                INSERT INTO payments (customerid, amount, paytime, pay_method) VALUES (custid, totcost, intime, pmethod);
+            END IF;
+        END IF;
+    END IF;
+END;
+/
+
+BEGIN
+    upstatus(37, 2, '01-MAY-2024 09:15:12 PM');
+END;
+/
+-- Output: Status updated
