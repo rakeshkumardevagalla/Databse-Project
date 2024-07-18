@@ -1,0 +1,49 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE check_customer(
+    v_email IN VARCHAR2
+) IS
+    v_count NUMBER;
+    V_CNAME VARCHAR2(100);
+    v_address VARCHAR2(100);
+    v_state VARCHAR2(100);
+    v_zip NUMBER;
+    v_credit NUMBER;
+    v_ordercount NUMBER;
+    v_totalcost NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM customer WHERE email = v_email;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('No Such Customer');
+    ELSE
+        SELECT cname, address, state, zipcode, STATE, CREDIT, COUNT(order_status), SUM(totalcost) 
+        INTO V_CNAME, v_address, v_state, v_zip, v_state, v_credit, v_ordercount, v_totalcost 
+        FROM customer c 
+        JOIN order_table o ON c.customerid = o.customerid
+        WHERE order_status = 'delivered' AND o.ordertime >= ADD_MONTHS(SYSDATE, -6) AND email = v_email 
+        GROUP BY cname, address, state, zipcode, STATE, EMAIL, CREDIT;
+        DBMS_OUTPUT.PUT_LINE('Customer Name: ' || v_cname || CHR(10) || 
+                             'Address: ' || v_address || CHR(10) || 
+                             'State: ' || v_state || CHR(10) || 
+                             'Zip: ' || v_zip || CHR(10) || 
+                             'Mail id: ' || v_email || CHR(10) || 
+                             'Credit: ' || v_credit || CHR(10) || 
+                             'Total order in last 6 months: ' || v_ordercount || CHR(10) || 
+                             'Total cost for the orders in past 6 months: ' || v_totalcost);
+    END IF;
+END;
+/
+
+BEGIN
+    check_customer('mary@gmail.com');
+END;
+/
+-- Output: Prints existing customer details
+
+BEGIN
+    check_customer('gurleen@gmail.com');
+END;
+/
+-- Output: No Such Customer
+
+SELECT * FROM customer;
