@@ -1,0 +1,44 @@
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE advancedsearch (
+    v_customerid IN NUMBER,
+    v_category_name IN VARCHAR2,
+    v_reviewscore IN NUMBER,
+    v_waittime IN DECIMAL
+) IS
+    v_count NUMBER;
+    v_RESTAURANTNAME VARCHAR2(50);
+    v_RADDRESS VARCHAR2(100);
+    v_CURRENT_STATUS VARCHAR2(10);
+    p_AVGREVIEWSCORE NUMBER;
+    v_RZIPCODE NUMBER;
+    v_AVGWAITTIME NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM customer WHERE customerid = v_customerid;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('Invalid Customer ID');
+    ELSE
+        SELECT RESTAURANTNAME, RADDRESS, CURRENT_STATUS, AVGREVIEWSCORE, RZIPCODE, AVGWAITTIME
+        INTO v_RESTAURANTNAME, v_RADDRESS, v_CURRENT_STATUS, p_AVGREVIEWSCORE, v_RZIPCODE, v_AVGWAITTIME
+        FROM RESTAURANTS r
+        WHERE r.CATEGORY_NAME = v_category_name AND r.AVGREVIEWSCORE >= v_reviewscore AND r.AVGWAITTIME <= v_waittime;
+
+        IF p_AVGREVIEWSCORE >= v_reviewscore THEN
+            DBMS_OUTPUT.PUT_LINE('The restaurant ' || v_RESTAURANTNAME || ' address is ' || v_RADDRESS || ' status ' || v_CURRENT_STATUS || ' with average review score ' || p_AVGREVIEWSCORE || ' having wait time ' || v_AVGWAITTIME);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('No restaurant found');
+        END IF;
+    END IF;
+END;
+/
+
+---Test Cases
+BEGIN
+    advancedsearch(3, 'Italian', 4.5, 30);
+END;
+/
+
+BEGIN
+    advancedsearch(5, 'Mexican', 4, 20);
+END;
+/
