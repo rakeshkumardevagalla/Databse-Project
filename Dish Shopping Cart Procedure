@@ -1,0 +1,74 @@
+DROP SEQUENCE cartdishvalues;
+CREATE SEQUENCE cartdishvalues
+START WITH 65
+INCREMENT BY 1;
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE dish_shopping_cart (
+    v_customerid IN NUMBER,
+    v_restaurantid IN NUMBER,
+    v_dishid IN NUMBER
+) IS
+    v_count NUMBER;
+    d_count NUMBER;
+    c_count NUMBER;
+    cd_count NUMBER;
+    v_quantity NUMBER;
+    v_cartid NUMBER;
+    v_current_status VARCHAR2(20);
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM customer WHERE customerid = v_customerid;
+    IF v_count = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('No such Customer');
+    ELSE
+        SELECT current_status INTO v_current_status FROM restaurants WHERE restaurantid = v_restaurantid;
+        IF v_current_status = 'Closed' THEN
+            DBMS_OUTPUT.PUT_LINE('The restaurant is closed');
+        ELSE
+            SELECT COUNT(*) INTO d_count FROM dishes d JOIN restaurants r ON d.restaurantid = r.restaurantid WHERE d.dishid = v_dishid AND d.restaurantid = v_restaurantid;
+            IF d_count = 0 THEN
+                DBMS_OUTPUT.PUT_LINE('Invalid Dish ID');
+            ELSE
+                SELECT COUNT(*) INTO c_count FROM cart WHERE customerid = v_customerid;
+                IF c_count = 0 THEN
+                    INSERT INTO cart(cartid, customerid, restaurantid) VALUES(cartvalues.NEXTVAL, v_customerid, v_restaurantid);
+                END IF;
+                SELECT COUNT(*) INTO cd_count FROM dishes d JOIN cartdish cd ON d.dishid = cd.dishid WHERE d.dishid = v_dishid;
+                IF cd_count = 0 THEN
+                    INSERT INTO cartdish VALUES(cartdishvalues.NEXTVAL, v_cartid, v_dishid, 1);
+                ELSE
+                    SELECT quantity INTO v_quantity FROM dishes d JOIN cartdish cd ON d.dishid = cd.dishid WHERE d.dishid = v_dishid;
+                    UPDATE cartdish SET quantity = v_quantity + 1 WHERE dishid = v_dishid;
+                END IF;
+            END IF;
+        END IF;
+    END IF;
+EXCEPTION
+    WHEN no_data_found THEN
+        DBMS_OUTPUT.PUT_LINE('No such restaurant');
+END;
+/
+
+
+---Test Cases
+
+BEGIN
+    dish_shopping_cart(1, 104, 43);
+END;
+/
+
+BEGIN
+    dish_shopping_cart(10, 101, 40);
+END;
+/
+
+BEGIN
+    dish_shopping_cart(3, 110, 42);
+END;
+/
+
+BEGIN
+    dish_shopping_cart(5, 102, 50);
+END;
+/
